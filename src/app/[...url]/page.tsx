@@ -1,12 +1,13 @@
 import { Redis } from "@upstash/redis";
 import { ragChat } from "@/lib/ragChat";
 import { redis } from "@/lib/redis";
+import { ChatWrapper } from "@/pages/ChatWrapper";
 
 //[...url] is used within a folder when that folder is to be attached to any url
 //ex: app/[...url], here ...url can be any url
 interface PageProps{
     params:{
-        url: string[]| string|undefined
+        url: string[]|string|undefined
     }
 }
 
@@ -22,8 +23,10 @@ const Page = async ({params}: PageProps) =>{
     console.log(reconstructedUrl)
     console.log(params)
 
+    const sessionId="mock-session";
+
     //redis works like sets. 
-    const addedURL=await redis.sismember("indexed-urls",reconstructedUrl)
+    const addedURL=await redis.sismember("indexed-urls",reconstructedUrl);
 
     if(!addedURL){
         await ragChat.context.add({
@@ -34,9 +37,9 @@ const Page = async ({params}: PageProps) =>{
         })
     }
     
-    await redis.sadd("indexed-urls",reconstructedUrl)
+    await redis.sadd("indexed-urls",reconstructedUrl); 
 
-    return <p>hello</p>
+    return <ChatWrapper sessionId={sessionId}/>
 }
 
 export default Page;
